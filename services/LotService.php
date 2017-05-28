@@ -41,8 +41,10 @@ class  LotService extends RestfulServer {
 			    				}
 			    			}  
 			    		}
-			    		$lot->summary = Capsule::select('SELECT billdetails.product_id, Sum(qty) AS qty, Sum(qty * price) / sum(qty) AS avg, products.`name`,products.product_code FROM billdetails LEFT JOIN products ON billdetails.product_id = products.id WHERE lot_name = ? GROUP BY lot_id, product_id',[$lotname]);
+			    		$lot->summary = Capsule::select('SELECT billdetails.product_id, Sum(qty) AS qty, Sum(qty * price) / sum(qty) AS avg, products.`name`, products.product_code FROM billdetails LEFT JOIN products ON billdetails.product_id = products.id WHERE lot_name = ? GROUP BY lot_id, product_id ORDER BY products.category_id ASC, products.product_code ASC',[$lotname]);
 			    		$lot->sumx = Capsule::select('SELECT IFNULL(sum(qty), 0) AS qty, IFNULL(sum(qty * price), 0) AS total, IFNULL(sum(qty * price) / sum(qty), 0) AS avg FROM billdetails WHERE lot_name = ? ',[$lotname]);
+
+			    		$lot->sumbycat = Capsule::select('SELECT billdetails.product_id, Sum(billdetails.qty) AS qty, Sum(qty * price) / sum(qty) AS avg, products.category_id, categories.`name` FROM billdetails LEFT JOIN products ON billdetails.product_id = products.id INNER JOIN categories ON categories.id = products.category_id WHERE lot_name = ? GROUP BY products.category_id',[$lotname]);
 			    	}
 			    // $this->dump($lot); exit();
 	    		$o->data = $lot;

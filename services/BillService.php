@@ -87,7 +87,7 @@ class  BillService extends RestfulServer {
 	    			Capsule::beginTransaction();
 					($this->input->bill->name ? $bill->name = $this->input->bill->name : null ); 
 					// $bill->billdetails->delete();
-					Billdetail::where('bill_id',$ill->id)->delete();
+					Billdetail::where('bill_id',$bill->id)->delete();
 					foreach($this->input->bill->billdetails as $detail ) {
 						if($detail->product_id) {
 							$billdetail = new Billdetail();
@@ -144,6 +144,131 @@ class  BillService extends RestfulServer {
 	    		$this->rest_error(-1,$e->getMessage(),'json',0); //or
 	    	}
 	    }
+
+		public function postInsupbill() {  //main function for insert update  new lot new bill all in one 
+			try {
+				Capsule::enableQuerylog();
+			 	Capsule::beginTransaction();
+				$o = new stdClass();
+				$o->name = __FUNCTION__;
+				$o->input = $this->input;
+				// $this->response($o,'json');
+				if($this->input->lot_id == 0 && $this->input->lot_name ) {
+					$lot = Lot::where('lot_name',$this->input->lot_name)->first();
+					if(empty($lot)) {
+						$lot = new Lot();
+					} 
+					$lot->branch_id  = ((isset($this->input->branch_id) && $this->input->branch_id) ? $this->input->branch_id : 1);
+					$lot->lot_name = ($this->input->lot_name ? $this->input->lot_name : null);
+					$lot->cate = ($this->input->cate ? $this->input->cate : null);
+					$lot->date = ($this->input->date ? $this->input->date : null);
+				} else {
+					$lot = Lot::find($this->input->lot_id);
+					$lot->cate = ($this->input->cate ? $this->input->cate : null);
+					$lot->date = ($this->input->date ? $this->input->date : null);
+				}
+
+				$lot->save();  // update or insert lot  
+				if($lot) {
+					    $totalqty = 0;
+						$totalamount = 0;
+					if($this->input->id == 'NEW') {  // New Bill can Add and Save All
+						$bill = new Bill();
+						$bill->branch_id = $lot->branch_id;
+						$bill->lot_id = $lot->id;
+						$bill->lot_name = $lot->lot_name;
+						$bill->name = ($this->input->name ? $this->input->name : null);
+						$bill->qty = 0 ;
+						$bill->total = 0 ;
+						$bill->save();
+						foreach( $this->input->billdetails as $billdetail ) {
+							if( $billdetail->qty && $billdetail->price && $billdetail->product_id && $bill  && $lot ){
+								$detail = new Billdetail();
+								$detail->item  = json_encode($billdetail->item,JSON_UNESCAPED_UNICODE);
+								$detail->branch_id  = $lot->branch_id;
+								$detail->lot_id  = $lot->id;
+								$detail->lot_name  = $lot->lot_name;
+								$detail->bill_id  = $bill->id;
+								$detail->product_id  = ($billdetail->product_id ? $billdetail->product_id : null );
+								$detail->name  = ($billdetail->name ? $billdetail->name : null );
+								$detail->qtystr  = ($billdetail->qtystr ? $billdetail->qtystr : null );
+								$detail->qty  = ($billdetail->qty ? $billdetail->qty : 0 );
+								$totalqty += $detail->qty;
+								$detail->price  = ($billdetail->price ? $billdetail->price : 0 );
+								$totalamount += $detail->price * $detail->qty;
+								$detail->save();
+							} // if check billdetail validate 
+						} // foreach
+	 				} else {  // else not New is  Update  and Delte Bill Items 
+	 					$bill = Bill::find($this->input->id);
+	 					if( empty($bill) || $bill->branch_id != $lot->branch_id || $bill->lot_id != $lot->id ){
+	 						throw new Exception('Data Error brand or lot id is not parent', 1);
+	 					}
+	 					$bill->name = ($this->input->name ? $this->input->name : null);
+	 					$bill->save();  // update bill only bill name
+	 					// $biil->billdetails->delete();
+	 					Billdetail::where('bill_id',$bill->id)->delete();
+	 					foreach ($this->input->billdetails as $billdetail) {
+							if( $billdetail->qty && $billdetail->price && $billdetail->product_id && $bill  && $lot ){
+								$detail = new Billdetail();
+								$detail->item  = json_encode($billdetail->item,JSON_UNESCAPED_UNICODE);
+								$detail->branch_id  = $lot->branch_id;
+								$detail->lot_id  = $lot->id;
+								$detail->lot_name  = $lot->lot_name;
+								$detail->bill_id  = $bill->id;
+								$detail->product_id  = ($billdetail->product_id ? $billdetail->product_id : null );
+								$detail->name  = ($billdetail->name ? $billdetail->name : null );
+								$detail->qtystr  = ($billdetail->qtystr ? $billdetail->qtystr : null );
+								$detail->qty  = ($billdetail->qty ? $billdetail->qty : 0 );
+								$totalqty += $detail->qty;
+								$detail->price  = ($billdetail->price ? $billdetail->price : 0 );
+								$totalamount += $detail->price * $detail->qty;
+								$detail->save();
+							} // if check billdetail validate 
+	 					}
+					}
+						$bill->qty = $totalqty;
+						$bill->total = $totalamount;
+						$bill->save();
+				}
+			 	Capsule::commit();
+				$o->data = $this->lot($lot->lot_name);
+				$o->bill = $this->bill($bill->id);
+				$o->bill->cate = $o->data->cate;
+				$o->bill->date = $o->data->date;
+				$this->response($o,'json');
+			} catch (Exception $e) {
+			 	Capsule::rollback();
+				$this->rest_error(-1,$e->getMessage(),'json',0); //or
+			}
+		}
+
+
+		private function lot($lotname){
+				$lot =  Lot::where('lot_name',$lotname)->leftjoin('categories as c','c.id','=','lots.cate')->select('lots.*','c.name')->first();
+			    	if($lot) {
+			    		foreach($lot->bills as $bill) {
+			    			if($bill){
+			    				foreach ($bill->billdetails as &$details) {
+			    					$details->item = json_decode($details->item);
+			    				}
+			    			}  
+			    		}
+			    		$lot->summary = Capsule::select('SELECT billdetails.product_id, Sum(qty) AS qty, Sum(qty * price) / sum(qty) AS avg, products.`name`,products.product_code FROM billdetails LEFT JOIN products ON billdetails.product_id = products.id WHERE lot_name = ? GROUP BY lot_id, product_id',[$lotname]);
+			    		$lot->sumx = Capsule::select('SELECT IFNULL(sum(qty), 0) AS qty, IFNULL(sum(qty * price), 0) AS total, IFNULL(sum(qty * price) / sum(qty), 0) AS avg FROM billdetails WHERE lot_name = ? ',[$lotname]);
+			    	}
+	    		return $lot;
+		}
+
+		private function bill($id) {
+			$bill = Bill::find($id);
+			foreach($bill->billdetails as $detail ) {
+				$detail->item = json_decode($detail->item);
+			}
+
+			$bill->save = false;
+			return $bill;
+		}
 
 		public function model(){
 			return new Bill();

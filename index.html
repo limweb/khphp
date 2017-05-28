@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Vue CDN JS </title>
+	<link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+	<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+</head>
+<body>
+<div id="app">
+		<table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+			<thead>
+				<tr>
+					<th v-for="(info,idx) in tableinfo" v-show="isShowcol(info.COLUMN_NAME)">{{info.COLUMN_NAME}}</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="(item,idx) in datas">
+					<td v-for="(value,key,idx) in item" v-show="isShowcol(key)">
+						{{value}}
+					</td>
+					<td nowrap>
+						<button @click="view(item)" class="btn btn-success btn-xs" data-title="Info" ><span class="glyphicon glyphicon-info-sign"></span></button>
+						<button @click="edit(item)" class="btn btn-primary btn-xs" data-title="Edit" ><span class="glyphicon glyphicon-pencil"></span></button>
+						<button @click="del(idx)" class="btn btn-danger btn-xs" data-title="Delete"><span class="glyphicon glyphicon-trash"></span></button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<pagination v-ref:table for="table" :per-page="PerPage" :records="Records"></pagination>
+		<pre>{{tableinfo}}</pre>
+		</div>
+ 	<template id="item-edit">
+      	<!-- <span  v-show="!inEdit">{{item}}</span> -->
+      	<!-- <input v-show="!inEdit" type="text" v-model="item" /> -->
+      	<input type="checkbox" id="jack" value="Jack" v-model="item">
+		<label for="jack">Jack</label>
+   </template>
+
+</div>	
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/vue-resource/dist/vue-resource.min.js"></script>
+<script src="https://unpkg.com/vuex@2.3.1/dist/vuex.min.js"></script>
+<script src="https://cdn.rawgit.com/matfish2/vue-pagination/master/dist/vue-pagination.min.js"></script>
+<script type="text/javascript">
+	var testdata = {"code":1,"status":200,"data":{"tableinfo":[{"COLUMN_NAME":"id","DATA_TYPE":"int"},{"COLUMN_NAME":"name","DATA_TYPE":"varchar"},{"COLUMN_NAME":"pricex","DATA_TYPE":"decimal"},{"COLUMN_NAME":"product_type","DATA_TYPE":"int"},{"COLUMN_NAME":"product_code","DATA_TYPE":"varchar"},{"COLUMN_NAME":"category_id","DATA_TYPE":"int"},{"COLUMN_NAME":"status","DATA_TYPE":"int"},{"COLUMN_NAME":"actived","DATA_TYPE":"int"},{"COLUMN_NAME":"description","DATA_TYPE":"varchar"},{"COLUMN_NAME":"created_date","DATA_TYPE":"timestamp"},{"COLUMN_NAME":"updated_date","DATA_TYPE":"timestamp"},{"COLUMN_NAME":"created_by","DATA_TYPE":"varchar"},{"COLUMN_NAME":"updated_by","DATA_TYPE":"varchar"}],"datas":[{"id":1,"name":"ทุเรียนหมอนทอง A","pricex":null,"product_type":0,"product_code":"DR-O1","category_id":1,"status":1,"actived":1,"description":"ทุเรียน A","created_date":"2017-05-04 19:58:17","updated_date":"2017-05-14 17:09:48","created_by":"system","updated_by":"system"},{"id":2,"name":"ทุเรียน B","pricex":null,"product_type":0,"product_code":"DR-02","category_id":1,"status":1,"actived":1,"description":"ทุเรียน B","created_date":"2017-05-04 19:58:29","updated_date":"2017-05-14 17:09:50","created_by":"system","updated_by":"system"},{"id":3,"name":"ทุเรียน C","pricex":null,"product_type":0,"product_code":"DR-03","category_id":1,"status":1,"actived":1,"description":"ทุเรียน C","created_date":"2017-05-04 19:58:47","updated_date":"2017-05-14 17:09:52","created_by":"system","updated_by":"system"},{"id":4,"name":"ค่านายหน้า","pricex":null,"product_type":1,"product_code":"EX-01","category_id":2,"status":1,"actived":1,"description":"ค่านายหน้า","created_date":"2017-05-14 15:02:33","updated_date":"2017-05-14 17:09:53","created_by":"system","updated_by":"system"},{"id":5,"name":"ค่าตัด","pricex":null,"product_type":1,"product_code":"EX-02","category_id":2,"status":1,"actived":1,"description":"ค่าตัด","created_date":"2017-05-14 15:02:39","updated_date":"2017-05-14 17:09:54","created_by":"system","updated_by":"system"},{"id":6,"name":"ค่ากล่อง","pricex":null,"product_type":1,"product_code":"EX-03","category_id":2,"status":1,"actived":1,"description":"ค่ากล่อง","created_date":"2017-05-14 15:02:44","updated_date":"2017-05-14 17:09:56","created_by":"system","updated_by":"system"}]}};
+	/* ----- Store ----- */
+	const state = {
+		testdata
+	};
+
+	const mutations = {
+
+	};
+
+	const store = new Vuex.Store({
+	  state,
+	  mutations
+	});
+
+	const Crudmix = {
+		  data(){
+	    	return {}
+	    },
+	    methods: {
+	    	confirm(msg) {
+	    		bootbox.confirm({
+				    message: "This is a confirm with custom button text and color! Do you like it?",
+				    size: 'small',
+				    buttons: {
+				        confirm: {
+				            label: 'Yes',
+				            className: 'btn-success'
+				        },
+				        cancel: {
+				            label: 'No',
+				            className: 'btn-danger'
+				        }
+				    },
+				    callback: function (result) {
+				        console.log('This was logged in the callback: ' + result);
+				    }
+				});
+	    	},
+	    	// view  (item){ 
+	    	// 	console.log('view(item)',item) 
+	    	// 	this.confirm('test');
+	    	// },
+			edit  (item){ console.log('edit(item)',item) },
+			del(idx) { console.log('delete(idx)',idx) },
+	    }
+	  };
+   Vue.use(VuePagination);
+	Vue.component('item-edit', {
+	  template: '#item-edit',
+	  props: {
+	    item: [Object,String],
+	    key: String
+	  },
+	  data() {
+	    return {
+	      inEdit: false,
+	    }
+	  },
+	  methods:{
+	   toggle(){
+	     this.inEdit = !this.inEdit;
+	   }
+	  }
+	});
+
+	var vm = new Vue({
+	mixins:[Crudmix],
+	store,
+	data(){	return {
+			Records: 10,
+			PerPage: 2,
+			table1Page:1
+		} 
+	},
+	el:'#app',
+	methods:{ 
+		isShowcol(col){
+			let chk = ['created_date','updated_date','created_by','updated_by'].find(i=>(i==col));
+			// console.log('chk=',chk)
+			if(chk){
+				return false;
+			}
+			return true;
+		},
+		// gettype(idx,key) {
+		// 	console.log('gettype',idx)
+		// 	let type = this.tableinfo[idx].DATA_TYPE;
+		// 	if(key == 'id' ) {
+		// 		return 'text';
+		// 	}
+		// 	return type;
+		// }
+	},
+	computed:{ 
+		tableinfo(){
+			return this.$store.state.testdata.data.tableinfo
+		},
+		datas(){
+			return this.$store.state.testdata.data.datas
+		}
+	},
+	watch:{ },
+	components:{ },
+	beforeCreate (){ },
+	created(){
+			this.gettype = function(idx,key) {
+				console.log('gettype',idx)
+				let type = this.tableinfo[idx].DATA_TYPE;
+				if(key == 'id' ) {
+					return 'text';
+				}
+				return type;
+			}
+
+			this.view = function(item){ 
+				console.log('test this',this)
+	    		console.log('view(item)',item) 
+	    		this.confirm('test');
+	    	}
+
+	 },
+	beforeMount(){ },
+	mounted(){
+		this.$on('vue-pagination::table', function(page) {
+    		this.table1Page = page;	
+    	});	
+	},
+	beforeUpdate(){ },
+	updated(){ },
+	beforeDestroy(){ },
+	destroyed(){ },
+	})	
+
+</script>
+</body>
+</html>
