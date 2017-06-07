@@ -27,7 +27,7 @@ class  AppService extends RestfulServer {
 						$bill->billdetails;
 					}
 				}
-				$o->products = Product::get();
+				$o->products = Product::orderby('category_id','asc')->orderBy('product_code','asc')->get();
 				$o->summary = Capsule::select('SELECT sum(qty) AS total, sum(qty * price) AS sumamount, sum(qty * price) / sum(qty) AS avg, p. NAME FROM billdetails bd LEFT JOIN products p ON p.id = bd.product_id  where branch_id = 1 GROUP BY product_id;',[]);
 
 				$summaryall = Capsule::select('SELECT sum(qty) AS qty, sum(qty * price) AS total, sum(qty * price) / sum(qty) AS avg FROM billdetails  where branch_id = 1 ',[]);
