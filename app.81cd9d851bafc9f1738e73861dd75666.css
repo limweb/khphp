@@ -1,0 +1,24 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);
+
+/*!
+ * Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ */
+
+/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}[hidden]{display:none}
+
+/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */@media print{*,:after,:before{color:#000!important;text-shadow:none!important;background:0 0!important;box-shadow:none!important}}@font-face{font-family:Glyphicons Halflings;src:url(/static/fonts/glyphicons-halflings-regular.f4769f9.eot);src:url(/static/fonts/glyphicons-halflings-regular.f4769f9.eot?#iefix) format("embedded-opentype"),url(/static/fonts/glyphicons-halflings-regular.448c34a.woff2) format("woff2"),url(/static/fonts/glyphicons-halflings-regular.fa27723.woff) format("woff"),url(/static/fonts/glyphicons-halflings-regular.e18bbf6.ttf) format("truetype"),url(/static/img/glyphicons-halflings-regular.8988968.svg#glyphicons_halflingsregular) format("svg")}*,:after,:before{box-sizing:border-box}html{font-size:10px;-webkit-tap-highlight-color:rgba(0,0,0,0)}body{font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.42857143;color:#333;background-color:#fff}[role=button]{cursor:pointer}@-webkit-keyframes progress-bar-stripes{0%{background-position:40px 0}to{background-position:0 0}}@keyframes progress-bar-stripes{0%{background-position:40px 0}to{background-position:0 0}}
+
+/*!
+ *   AdminLTE v2.3.8
+ *   Author: Almsaeed Studio
+ *	 Website: Almsaeed Studio <http://almsaeedstudio.com>
+ *   License: Open source - MIT
+ *           Please visit http://opensource.org/licenses/MIT for more information
+!*/body,html{height:100%}body{font-family:Source Sans Pro,Helvetica Neue,Helvetica,Arial,sans-serif;font-weight:400;overflow-x:hidden;overflow-y:auto}@keyframes flipInX{0%{transform:perspective(400px) rotateX(90deg);transition-timing-function:ease-in;opacity:0}40%{transform:perspective(400px) rotateX(-20deg);transition-timing-function:ease-in}60%{transform:perspective(400px) rotateX(10deg);opacity:1}80%{transform:perspective(400px) rotateX(-5deg)}to{transform:perspective(400px)}}@-webkit-keyframes flipInX{0%{-webkit-transform:perspective(400px) rotateX(90deg);-webkit-transition-timing-function:ease-in;opacity:0}40%{-webkit-transform:perspective(400px) rotateX(-20deg);-webkit-transition-timing-function:ease-in}60%{-webkit-transform:perspective(400px) rotateX(10deg);opacity:1}80%{-webkit-transform:perspective(400px) rotateX(-5deg)}to{-webkit-transform:perspective(400px)}}
+
+/*!
+ *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome
+ *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
+ */@font-face{font-family:FontAwesome;src:url(/static/fonts/fontawesome-webfont.674f50d.eot);src:url(/static/fonts/fontawesome-webfont.674f50d.eot?#iefix&v=4.7.0) format("embedded-opentype"),url(/static/fonts/fontawesome-webfont.af7ae50.woff2) format("woff2"),url(/static/fonts/fontawesome-webfont.fee66e7.woff) format("woff"),url(/static/fonts/fontawesome-webfont.b06871f.ttf) format("truetype"),url(/static/img/fontawesome-webfont.912ec66.svg#fontawesomeregular) format("svg");font-weight:400;font-style:normal}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(359deg);transform:rotate(359deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(359deg);transform:rotate(359deg)}}@-webkit-keyframes minhand{0%{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(1turn)}}@keyframes minhand{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(1turn);transform:rotate(1turn)}}@-webkit-keyframes hrhand{0%{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(1turn)}}@keyframes hrhand{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(1turn);transform:rotate(1turn)}}

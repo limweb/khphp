@@ -178,6 +178,8 @@ class  BillService extends RestfulServer {
 						$bill->lot_id = $lot->id;
 						$bill->lot_name = $lot->lot_name;
 						$bill->name = ($this->input->name ? $this->input->name : null);
+						// $blii->supplier = ($this->input->supplier ? $this->input->supplier : null);
+						// $bill->supplier_id = ($this->input->supplier_id ? $this->input->supplier_id  : null );
 						$bill->qty = 0 ;
 						$bill->total = 0 ;
 						$bill->save();

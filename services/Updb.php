@@ -55,5 +55,5 @@ class  Updb  {
 
 }
 
-// $updb = new Updb();
-// $updb->updatedb();
+$updb = new Updb();
+$updb->updatedb();

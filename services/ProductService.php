@@ -37,7 +37,7 @@ class  ProductService extends RestfulServer {
 			$edate = $this->input->edate;
 			$o->input = $this->input;
 
-			$bdqry = Billdetail::select(Capsule::raw('Sum(qty) AS total,Sum(qty * price) AS sumamount,sum(qty * price) / sum(qty) AS avg,p.`name`'))->leftjoin('products as p','p.id','=','product_id')->whereBetween('billdetails.created_date',[$sdate,$edate])->groupBy('product_id');
+			$bdqry = Billdetail::select(Capsule::raw('Sum(qty) AS total, Sum(qty * price) AS sumamount, sum(qty * price) / sum(qty) AS avg,p.`name`'))->leftjoin('products as p','p.id','=','product_id')->whereBetween('billdetails.created_date',[$sdate,$edate])->groupBy('product_id');
 			if($branchid != -1 ) {
 				$o->summary =  $bdqry->where('branch_id',$branchid)->get();		
 			} else {
@@ -45,7 +45,7 @@ class  ProductService extends RestfulServer {
 			}
 			// $o->summaryall = Capsule::select('SELECT sum(qty) AS qty, sum(qty * price) AS total, sum(qty * price) / sum(qty) AS avg FROM billdetails WHERE billdetails.branch_id = ? AND billdetails.created_date BETWEEN  ? and ?  ',[$branchid,$sdate,$edate]);
 			
-			$bdqry = Billdetail::select(Capsule::raw('Sum(qty) AS total,Sum(qty * price) AS sumamount,sum(qty * price) / sum(qty) AS avg,p.`name`'))->leftjoin('products as p','p.id','=','product_id')->whereBetween('billdetails.created_date',[$sdate,$edate]);
+			$bdqry = Billdetail::select(Capsule::raw('Sum(qty) AS total,Sum(qty * price) AS sumamount,sum(qty * price) / sum(qty) AS avg, concat("all") as name '))->leftjoin('products as p','p.id','=','product_id')->whereBetween('billdetails.created_date',[$sdate,$edate]);
 			if($branchid != -1 ) {
 				$o->summaryall =  $bdqry->where('branch_id',$branchid)->get();		
 			} else {

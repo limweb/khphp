@@ -18,7 +18,8 @@ class  AppService extends RestfulServer {
 				$this->getUpdateallbills();
 				$o = new stdClass();
 				$rs = Branch::get();
-				// $o->branchs = $rs;
+				$o->branchs = $rs;
+				$o->suppliers = Supplier::get();
 				$o->branch = Branch::find(1);
 				$o->categories = Category::get();
 				$o->lots = Lot::leftjoin('categories as c','c.id','=','lots.cate')->select('lots.*','c.name')->where('branch_id',$o->branch->id)->orderBy('lot_name','desc')->get();
@@ -26,14 +27,18 @@ class  AppService extends RestfulServer {
 					foreach($lot->bills as $bill){
 						$bill->billdetails;
 					}
+					$lot->summary = Capsule::select('SELECT billdetails.product_id, Sum(qty) AS qty,Sum(qty * price) as total, Sum(qty * price) / sum(qty) AS avg, products.`name`, products.product_code FROM billdetails LEFT JOIN products ON billdetails.product_id = products.id WHERE lot_name = ? GROUP BY lot_id, product_id ORDER BY products.category_id ASC, products.product_code ASC',[$lot->lot_name]);
+			    	$lot->sumx = Capsule::select('SELECT IFNULL(sum(qty), 0) AS qty, IFNULL(sum(qty * price), 0) AS total, IFNULL(sum(qty * price) / sum(qty), 0) AS avg FROM billdetails WHERE lot_name = ? ',[$lot->lot_name]);
+
+			    	$lot->sumbycat = Capsule::select('SELECT billdetails.product_id, Sum(billdetails.qty) AS qty,Sum(qty * price) as total, Sum(qty * price) / sum(qty) AS avg, products.category_id, categories.`name` FROM billdetails LEFT JOIN products ON billdetails.product_id = products.id INNER JOIN categories ON categories.id = products.category_id WHERE lot_name = ? GROUP BY products.category_id',[$lot->lot_name]);
 				}
 				$o->products = Product::orderby('category_id','asc')->orderBy('product_code','asc')->get();
-				$o->summary = Capsule::select('SELECT sum(qty) AS total, sum(qty * price) AS sumamount, sum(qty * price) / sum(qty) AS avg, p. NAME FROM billdetails bd LEFT JOIN products p ON p.id = bd.product_id  where branch_id = 1 GROUP BY product_id;',[]);
+				// $o->summary = Capsule::select('SELECT sum(qty) AS total, sum(qty * price) AS sumamount, sum(qty * price) / sum(qty) AS avg, p. NAME FROM billdetails bd LEFT JOIN products p ON p.id = bd.product_id  where branch_id = 1 GROUP BY product_id;',[]);
 
-				$summaryall = Capsule::select('SELECT sum(qty) AS qty, sum(qty * price) AS total, sum(qty * price) / sum(qty) AS avg FROM billdetails  where branch_id = 1 ',[]);
-				if($summaryall) {
-					$o->summaryall = (object) $summaryall[0];
-				}
+				// $summaryall = Capsule::select('SELECT sum(qty) AS qty, sum(qty * price) AS total, sum(qty * price) / sum(qty) AS avg FROM billdetails  where branch_id = 1 ',[]);
+				// if($summaryall) {
+				// 	$o->summaryall = (object) $summaryall[0];
+				// }
 				// $this->dump($o); exit();
 				$this->response($o,'json');
 			} catch (Exception $e) {
@@ -62,6 +67,7 @@ class  AppService extends RestfulServer {
 				if($summaryall) {
 					$o->summaryall = (object) $summaryall[0];
 				}
+				$this->dump($o->lots[0]);
 				$this->dump($o); exit();
 				$this->response($o,'json');
 			} catch (Exception $e) {

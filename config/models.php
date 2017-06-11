@@ -124,3 +124,15 @@ class Product  extends  Model  {
         const CREATED_AT = 'created_date';
         const UPDATED_AT = 'updated_date';
 }
+
+class Supplier  extends  Model  { 
+        
+        protected  $table='suppliers';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function __construct(array $attributes = []) {
+            //$this->setRawAttributes(['expire_date' => Carbon::now()->addDays(7)],true);
+            parent::__construct($attributes);
+        }
+}
